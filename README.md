@@ -3,7 +3,7 @@ A basic spring boot app using hibernate. Doing crud operations on SQL database
 
 Database operation are done on a hosted SQL database
 
-Site link - https://powerful-reef-64245.herokuapp.com/employees/list
+Site link - https://secret-harbor-70916.herokuapp.com/employees/list
 
 Restsful endpoints- 
 Get - https://limitless-springs-42741.herokuapp.com/api/employees 
