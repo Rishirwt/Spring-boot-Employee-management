@@ -1,0 +1,740 @@
+Spring framework:
+
+dependency injection - instead of hardcoding objects in class code, we will be injecting them outside the class
+
+interface Shape{
+void draw();
+}
+
+
+class Circle implements Shape{
+void draw(){
+}
+}
+
+class Rectangle implements Shape{
+void draw(){
+}
+}
+
+Class Drawing{
+Shape ss;
+// we will pass object whose draw method we have to call
+Drawing(Shape s){
+this.ss = s;
+}
+
+public void draw{
+ss.draw();
+}
+
+} 
+
+*Beanfactory can be used to create object and return using xml file
+   ///   BeanFactory factory=new XmlBeanFactory(new FileSystemResource("C:/Users/Rishabh Rawat/IdeaProjects/Java-learning-spring/src/main/java/spring.xml"));
+
+<beans>
+    <bean id="triangle" class = "Triangle">
+        <property name="name" value = "equilateral"/>
+    </bean>
+</beans>
+
+public class Triangle extends Shape{
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void draw(){
+        System.out.println(this.name+" triangle drawn");
+    }
+
+}
+
+
+*spring container
+
+create and manage objects (IOC)
+inject object dependency( Dependency injection)
+
+Injection types:
+constructor injection
+Setter injection
+
+
+*properties file
+ we can put values in properties file include in application context and use them in bean value 
+using ${ }  sign.
+
+*to load the properties file : sport.properties
+<context:property-placeholder location = "classpath:sport.properties"/>
+
+* by default bean scope is singleton for beans
+reference for same object is shared
+other scopes
+*prototype - creates a new bean instance for each container request
+*session - scoped to an http web request
+*request- scoped to an http web session
+*global-session - 
+
+bean lifecycle methods/hooks
+
+bean initialization
+init-method
+
+bean destruction
+destroy-method
+
+Special Note about init and destroy Method Signatures
+
+When using XML configuration, I want to provide additional details regarding the method signatures of the init-method  and destroy-method .
+
+Access modifier
+The method can have any access modifier (public, protected, private)
+
+Return type
+The method can have any return type. However, "void' is most commonly used. If you give a return type just note that you will not be able to capture the return value. As a result, "void" is commonly used.
+
+Method name
+The method can have any method name.
+
+Arguments
+The method can not accept any arguments. The method should be no-arg.
+ 
+For prototype scope . destroy method is not called .
+Spring doesnot manage complete lifecycle of a prototype bean.
+
+
+*What are java annotation?
+
+special labels added to java classes
+provide meta data about the class
+processed at compile time or run time for special processing
+
+we can confgure our spring beans with annotations which remove xml lengthy config.
+
+Spring will scan our java classes for special annotations
+it will automatically registed bean in the spring container
+
+@Component is used to register bean
+@Component("bean id")
+
+if id is not given then id be taken as first lowercaseletter and else is same as classname
+
+* Autowiring ( dependency injection using annotations)
+@Autowired is used
+Spring will scan the component that implements the interface of class which our class implements
+
+Constructor injection
+  //@Autowired
+    public TennisCoach(FortuneService theFortuneService) {
+        System.out.println(" theFortuneService " + theFortuneService);
+        fortuneService = theFortuneService;
+    }
+
+As of Spring Framework 4.3, an @Autowired annotation on such a constructor is no longer necessary 
+if the target bean only defines one constructor to begin with.
+ However, if several constructors are available, at least one must be annotated to teach the container which one to use.
+
+setter injection
+
+we can give anyname to function and pass bean class as arguments and put autowired annotation
+
+*field injection
+use java technology reflection
+apply @Autowired directly to the field
+
+*What if we have multiple implementations of interface, how spring know which one to pick?
+-exception is thrown nouniquebeandefinationfound
+
+in order to resolve this we need to tell which implementation(bean) to use
+@Qualifier annotation is used
+@Qualifier(bean name) - bean name is default class name with first letter lowercase 
+we can use it for all injection - cons , setter and field
+
+In general, when using Annotations, for the default bean name, Spring uses the following rule.
+
+If the annotation's value doesn't indicate a bean name, an appropriate name will be built based on the short name of the class (with the first letter lower-cased).
+
+For example:
+
+HappyFortuneService --> happyFortuneService
+However, for the special case of when BOTH the first and second characters of the class name are upper case, then the name is NOT converted.
+
+For the case of RESTFortuneService
+
+RESTFortuneService --> RESTFortuneService
+
+No conversion since the first two characters are upper case.
+
+we can simply give name to the bean and use the name in this case.
+
+
+
+* @Qualifier is a nice feature, but it is tricky when used with Constructors.
+
+The syntax is much different from other examples and not exactly intuitive.  Consider this the "deep end of the pool" when it comes to Spring configuration LOL :-)
+
+You have to place the @Qualifier annotation inside of the constructor arguments. 
+    @Autowired
+    public TennisCoach(@Qualifier("randomFortuneService") FortuneService theFortuneService) {
+
+        System.out.println(">> TennisCoach: inside constructor using @autowired and @qualifier");
+        
+        fortuneService = theFortuneService;
+    }
+       
+* To inject values from properties file using annotations
+Add the following lines in applicationcontext.xml file:
+
+    <context:property-placeholder location="classpath:sport.properties"/>  
+
+This should appear just after the <context:component-scan .../> line
+
+
+and use @Value("${ name }")
+ex:
+@Value("${foo.email}")
+private String email;
+
+Singleton Design pattern
+
+class Singleton
+{
+    private static Singleton obj;
+ 
+    // private constructor to force use of
+    // getInstance() to create Singleton object
+    private Singleton() {}
+ 
+    public static Singleton getInstance()
+    {
+        if (obj==null)
+            obj = new Singleton();
+        return obj;
+    }
+}
+
+*Scope bean using annotations:
+@Scope("singleton | prototype")
+
+Bean lifecycle:
+init-method is called using @PostConstruct annotation
+code willexecute after constructor and after dependency injections
+
+destroy-method - @PreDestroy
+
+code will execute before bean is destroyed
+I want to provide additional details regarding the method signatures of @PostContruct and @PreDestroy methods.
+
+Access modifier
+
+The method can have any access modifier (public, protected, private)
+
+Return type
+The method can have any return type. However, "void' is most commonly used. If you give a return type just note that you will not be able to capture the return value. As a result, "void" is commonly used.
+
+Method name
+The method can have any method name.
+
+Arguments
+The method can not accept any arguments. The method should be no-arg.
+
+HEADS UP - FOR JAVA 9, 10 and 11 USERS - @PostConstruct and @PreDestroy
+
+If you are using Java 9 or higher, then you will encounter an error when using @PostConstruct and @PreDestroy in your code. 
+
+* instead of xml ,we can create a config class
+
+using @Configuration and @ComponentScan annnotations
+
+
+* we can define bean in config file without @Component annotation or xml file
+using @Bean
+Question:
+
+During All Java Configuration, how does the @Bean annotation work in the background?
+
+
+
+Answer
+
+This is an advanced concept. But I'll walk through the code line-by-line.
+
+For this code:
+
+  @Bean 
+  public Coach swimCoach() {   
+   SwimCoach mySwimCoach = new SwimCoach();   
+   return mySwimCoach; 
+  }
+At a high-level, Spring creates a bean component manually. By default the scope is singleton. So any request for a "swimCoach" bean, will get the same instance of the bean since singleton is the default scope.
+
+
+
+However, let's break it down line-by-line
+
+@Bean
+
+
+The @Bean annotation tells Spring that we are creating a bean component manually. We didn't specify a scope so the default scope is singleton.
+
+ public Coach swimCoach(){
+This specifies that the bean will bean id of "swimCoach". The method name determines the bean id. The return type is the Coach interface. This is useful for dependency injection. This can help Spring find any dependencies that implement the Coach interface.
+
+The @Bean annotation will intercept any requests for "swimCoach" bean. Since we didn't specify a scope, the bean scope is singleton. As a result, it will give the same instance of the bean for any requests.
+
+
+
+ SwimCoach mySwimCoach = new SwimCoach();
+This code will create a new instance of the SwimCoach.
+
+
+
+ return mySwimCoach;
+This code returns an instance of the swimCoach.
+
+----
+
+
+
+Now let's step back and look at the method in it's entirety.
+
+ @Bean 
+ public Coach swimCoach() {   
+   SwimCoach mySwimCoach = new SwimCoach();   
+   return mySwimCoach; 
+ }
+
+
+It is important to note that this method has the @Bean annotation. The annotation will intercept ALL calls to the method "swimCoach()". Since no scope is specified the @Bean annotation uses singleton scope. Behind the scenes, during the @Bean interception, it will check in memory of the Spring container (applicationContext) and see if this given bean has already been created.
+
+If this is the first time the bean has been created then it will execute the method as normal. It will also register the bean in the application context. So that is knows that the bean has already been created before. Effectively setting a flag.
+
+The next time this method is called, the @Bean annotation will check in memory of the Spring container (applicationContext) and see if this given bean has already been created. Since the bean has already been created (previous paragraph) then it will immediately return the instance from memory. It will not execute the code inside of the method. Hence this is a singleton bean.
+
+The code for
+
+ SwimCoach mySwimCoach = new SwimCoach(); 
+ return mySwimCoach;
+is not executed for subsequent requests to the method public Coach swimCoach() . This code is only executed once during the initial bean creation since it is singleton scope.
+
+
+
+That explains how @Bean annotation works for the swimCoach example.
+
+====
+
+Now let's take it one step further.
+
+Here's your other question
+
+>> Please explain in detail whats happening behind the scene for this statement.
+
+return new SwimCoach(sadFortuneService())
+
+
+The code for this question is slightly different. It is injecting a dependency.
+
+In this example, we are creating a SwimCoach and injecting the sadFortuneService().
+
+         // define bean for our sad fortune service
+        @Bean
+        public FortuneService sadFortuneService() {
+            return new SadFortuneService();
+        }
+        
+        // define bean for our swim coach AND inject dependency
+        @Bean
+        public Coach swimCoach() {
+            SwimCoach mySwimCoach = new SwimCoach(sadFortuneService());
+            
+            return mySwimCoach;
+        }
+
+
+Using the same information presented earlier
+
+The code
+
+        // define bean for our sad fortune service
+        @Bean
+        public FortuneService sadFortuneService() {
+            return new SadFortuneService();
+        }
+
+
+In the code above, we define a bean for the sad fortune service. Since the bean scope is not specified, it defaults to singleton.
+
+Any calls for sadFortuneService, the @Bean annotation intercepts the call and checks to see if an instance has been created. First time through, no instance is created so the code executes as desired. For subsequent calls, the singleton has been created so @Bean will immediately return with the singleton instance.
+
+
+
+Now to the main code based on your question.
+
+return new SwimCoach(sadFortuneService())
+This code creates an instance of SwimCoach. Note the call to the method sadFortuneService(). We are calling the annotated method above. The @Bean will intercept and return a singleton instance of sadFortuneService. The sadFortuneService is then injected into the swim coach instance.
+
+
+
+This is effectively dependency injection. It is accomplished using all Java configuration (no xml).
+
+---
+
+This concludes the line-by-line discussion of the source code. All of the behind the scenes work.
+
+To include properties file values
+we can use
+@PropertySource annotation
+on config class
+
+and we fetch using
+@Value(${ foo.email })
+private String email;
+
+
+What is Spring mvc:
+framework for building web applications
+Based on Model-View-Controller pattern
+Leverages features of the core Spring framework (IOC , DI)
+
+Controller:
+
+code created by dev
+
+handle the request
+store/retrieve data
+place data in model
+
+send to appropriate template
+
+Model:
+contains your data
+
+store /ret data via backend systems
+
+View template:
+supports many view temp
+
+most common jsp+ jstl,
+thymeleaf
+
+developer creates a page
+display data
+
+* @Controller used is used to create Controller class
+@Controller inherits from @Component supports scanning
+
+@Controller can be used at class level
+ if used at class level then method level req mapping will be relative to parent REq mapping
+
+@RequestMapping is used to map a path to a method name
+we can choose any methodname
+
+* we must give name to form input element to use that value
+
+*Model - used to hold data to use in jsp files 
+
+	@RequestMapping("/processForm2")
+	public String letsShoutDude(HttpServletRequest request,Model model) {
+		
+		System.out.println(request);
+		System.out.println(model);
+		//read the req parameter from HTML form		
+		String name = request.getParameter("studentName");
+		
+		//convert data to caps
+		name = name.toUpperCase();
+		
+		//create the message
+		String result = "YO " + name;
+		
+		//add message to the model
+		model.addAttribute("message",result);
+		return "helloworld";
+	}
+
+
+How to link static files in program
+
+https://www.udemy.com/course/spring-hibernate-tutorial/learn/lecture/5608584#content
+
+
+@RequestParam is used to assign value from the form request to the variable
+
+@RequestMapping("/processForm3")
+	public String processForm3(@RequestParam("studentName") String name,Model model) {
+		
+		//convert data to caps
+		name = name.toUpperCase();
+		
+		//create the message
+		String result = "YO MY FRIEND USING ANNOTATION ~ " + name;
+		
+		//add message to the model
+		model.addAttribute("message",result);
+		return "helloworld";
+	}
+
+DAta binding - using model attribute and spring mvc form
+*when modelattribute is used:
+-when form is load form uses getter and when form is submitted form use setter method
+
+
+mvc form
+<form:form></form:form >
+<form:input></form:input path="fieldname of class">
+<form:select></form:select>:- drop down menu
+
+
+path attribute is used to map it to field of the mapping class
+
+Validation using annotation:
+
+@Valid annotation is required.
+BindingResult argument captures the validation result we can use.
+
+When performing Spring MVC validation, the location of the BindingResult parameter is very important. In the method signature, the BindingResult parameter must appear immediately after the model attribute. 
+
+If you place it in any other location, Spring MVC validation will not work as desired. In fact, your validation rules will be ignored.
+
+        @RequestMapping("/processForm")
+        public String processForm(
+                @Valid @ModelAttribute("customer") Customer theCustomer,
+                BindingResult theBindingResult) {
+            ...            
+        }
+
+@NotNull
+@Min(size = 1, message = "grater than 1") 
+to check if field is not empty
+
+@InitBinder - acts as a preprocessor
+
+to check value in range
+@Min(value = 5,message = "must be equal or greater than 5")
+@Max(value = 10,must be equal or less than 10)
+
+@Pattern(regexp = "^[a-zA-Z0-9]{5}" , message = "only 5 chars/digits")
+	private String postalCode;
+for regex exp as validation
+
+to make interger value not null , use INTEGER type than int 
+
+
+-we can add our custom messages using messages.properties file and loading it into servlet.xml file
+
+*Hibernate
+
+a framework for persisting /saving java objects in a database
+benefits:
+-handles low level sql code
+-minimize he jdbc code to develop
+-it provides ORM
+
+ORM- developer defines mapping between java class to database table
+
+-Hibernate used jdbc for all database communications
+
+WE have to set up jdbc to run hibernate
+
+to map class to table use
+@Entity
+@Table(name=" ")
+
+
+to map field of class to columns of table
+@Id
+@Column(name=" ")
+
+
+QUESTION:
+Why we are using JPA Annotation instead of Hibernate ?
+
+For example, why we are not using this org.hibernate.annotations.Entity?
+
+ANSWER:
+JPA is a standard specification. Hibernate is an implementation of the JPA specification.
+
+Hibernate implements all of the JPA annotations.
+
+The Hibernate team recommends the use of JPA annotations as a best practice.
+
+## how to generate sql tables using java hibernate
+https://www.dineshonjava.com/hibernate/hbm2ddl-configuration-and-name/
+
+#SessionFactory
+-Reads the hibernate config file
+-create Session objects
+-Heavy weight objects
+-only create once in your app
+
+#Session
+-wraps a JDBC connection
+-main object to save/retrieve objects
+short lived
+retrieved from SessionFactory
+
+*start the session
+save student
+-session.beginTransaction();
+-session.save(object) to save the object
+-session.getTransaction().commit();  // commit the changes
+
+to fetch student object usind id
+
+//retrieving our student object
+		session = factory.getCurrentSession();
+		session.beginTransaction();
+		System.out.println("getting student with id" + student.getId());
+		
+		Student st = session.get(Student.class, student.getId());
+		
+		System.out.println("retrieved student : "+st);
+		System.out.println("done");
+
+to create query and fetch all 
+java.util.List<Student> theStudents = 
+				session.createQuery("from Student").getResultList();
+		
+for update
+	session.beginTransaction();
+		
+		Student ss = session.get(Student.class,"1");
+		System.out.println(ss);
+		ss.setEmail("changes@gmail.com");
+		session.getTransaction().commit();
+
+or
+by query
+session.createQuery("update Student set email = 'chnge@gmail.com'").executeUpdate();
+then commint by session.getTransaction.commit();
+
+for delete
+
+-retrieve the object then
+session.delete(obj);
+commit 
+
+-or using query
+.createQuery("delete from Student where id = 2")
+.executeUpdate();
+
+Entity lifecycle : session method calls
+Detach : if entity is detached , it is not associated wit hibernate session
+Merge: if hibernate is detached from session, then merge will reattach to session
+Persist : Transitions new instance to managed state. Next flush/commit will save in db
+remove : Transitions managed entity to be removed .Next flush/commit will delete from db
+refresh - reload / sync object with data from db. Prevents stale data
+
+
+Cascade - you can cascade operations
+-apply the same operation to related entities
+
+@OneToOne - cascade types
+
+type        desc
+Persist    if entity is saved/persisted , related entity will also be persist
+
+REMOVE    if entity is removed/deleted , related entity will also be deleted
+
+Refresh   if     ""                 ""
+
+Detach
+
+Merge
+
+All - all of aboce cascade types
+
+To apply cascade using annotation
+use @OneToOne(cascade = CascadeType.ALL)
+		or
+@OneToOne(cascade = {CascadeType.PERSIST,
+			CasecadeType.REMOVE})
+
+
+by default its none
+to join for one-to-one mapping
+// mapping one to one
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "instructor_detail_id")
+	private InstructorDetail instructorDetail;
+
+* Bi directional
+
+no change to schema is req ,only update java code
+
+@OneToOne(mappedBy = "instructorDetail" , cascade = CascadeType.ALL)
+
+we have to break link so that we can delete from second foregn table
+
+
+Eager / Lazy 
+
+@ManyToOne(fetch=FetchType.LAZY)
+
+* Maven  (build tool)
+-handles jar dependencies
+-it will also download the supporting dependencies
+-this will handle automatically
+
+- provide standard directory structure
+- can build and run a project with minimal local configuration
+
+POM file structure
+
+project meta data  (name , version , jar/war)
+dependencies ( list of jars required to run)
+plug ins (custom tasks to run - running junit tests and create report)
+
+group id - name of org
+artifact id - name of the project
+version a specific release
+if project is under active development then 1.0 snapshot
+
+Archetypes - 
+templates files for a given maven project
+maven-archetype-webapp - to generate a sample maven webapp project
+
+m2e is plugin for maven integration for eclipse
+
+* spring security
+
+scurity concepts
+authentication - check user id pass with credentials stored in app / db
+authorization - if user have authorized role
+
+Declarative config-
+-define app security constraints in config
+-all java config @configuration,no xml
+-or spring xml config
+
+- provide separation of concerns between app code and security
+
+programmatic scurity
+-spring security provides api for custom app coding
+- provides greater customization for specific app req.
+
+diff login methods
+- http basic authentication
+- spring security provides own default logic form
+- custom logic form
+
+spring security basically need to maven dependency
+spring-security-web
+spring-security-config
+
+to check any param in url 
+
+${param.name} != null
+
+antMatchers("/systems/**").hasRole("ADMIN")
+
+match on path /systems and sub directories if they have the role
+
